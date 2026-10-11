@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>GAuth</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">◈</span>
+      <span>GAuth</span>
+    </div>
+    <div class="head-actions">
+      <button id="btnSettings" class="icon-btn" title="Настройки">⚙</button>
+      <button id="btnAdd" class="icon-btn" title="Добавить аккаунт">＋</button>
+    </div>
+  </header>
+
+  <main id="list" class="list"></main>
+
+  <div id="empty" class="empty hidden">
+    <div class="empty-icon">◈</div>
+    <p>Нет аккаунтов</p>
+    <p class="muted">Нажми ＋ чтобы добавить:<br>QR-файл, otpauth://ссылку или секрет</p>
+  </div>
+
+  <div class="sync-bar">
+    <button id="btnSync" class="sync-btn" title="Обновить файл vault.gauth для десктоп-приложения">⬇ Синхронизация с ПК</button>
+    <div id="syncStatus" class="sync-status hidden"></div>
+  </div>
+
+  <div id="toast" class="toast hidden">Скопировано</div>
+
+  <!-- Модалка добавления -->
+  <div id="modalAdd" class="modal hidden">
+    <div class="modal-card">
+      <h2>Добавить аккаунт</h2>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="qr">QR-файл</button>
+        <button class="tab" data-tab="link">Ссылка</button>
+        <button class="tab" data-tab="manual">Вручную</button>
+      </div>
+
+      <div class="tab-body" id="tab-qr">
+        <p class="hint">На телефоне: Аутентификатор → Перенос аккаунтов → Экспорт.
+        Сфотографируй/скриншоть <b>все QR сразу</b> (обычно 2 шт) и загрузи снимок сюда —
+        расширение найдёт и разберёт все QR на картинке, включая формат
+        <code>otpauth-migration://</code>.</p>
+        <input type="file" id="qrFile" accept="image/*">
+        <div id="qrPreview" class="qr-preview hidden"><img id="qrImg" alt="QR"></div>
+      </div>
+
+      <div class="tab-body hidden" id="tab-link">
+        <p class="hint">Вставь ссылку <code>otpauth://totp/...</code> или
+        <code>otpauth-migration://offline?data=...</code> (одной строкой).</p>
+        <textarea id="linkInput" rows="3" placeholder="otpauth://totp/Google:you@gmail.com?secret=...&amp;issuer=Google"></textarea>
+      </div>
+
+      <div class="tab-body hidden" id="tab-manual">
+        <label>Имя / аккаунт
+          <input type="text" id="mName" placeholder="you@gmail.com">
+        </label>
+        <label>Сервис <span class="muted">(необязательно)</span>
+          <input type="text" id="mIssuer" placeholder="Google">
+        </label>
+        <label>Секрет (base32)
+          <input type="text" id="mSecret" placeholder="JBSWY3DPEHPK3PXP" autocapitalize="characters">
+        </label>
+      </div>
+
+      <div id="addError" class="error hidden"></div>
+
+      <div class="modal-actions">
+        <button id="btnCancel" class="btn ghost">Отмена</button>
+        <button id="btnSave" class="btn primary">Добавить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модалка настроек -->
+  <div id="modalSettings" class="modal hidden">
+    <div class="modal-card">
+      <h2>Настройки</h2>
+
+      <label class="row-check">
+        <input type="checkbox" id="optAutofill">
+        <span>Автоматически вводить код на accounts.google.com</span>
+      </label>
+
+      <div class="danger">
+        <button id="btnExport" class="btn ghost">Экспорт секретов (JSON)</button>
+        <button id="btnClear" class="btn danger">Удалить все аккаунты</button>
+      </div>
+
+      <p class="hint">Секреты хранятся только на этом ПК в chrome.storage.local.
+      Файл экспорта содержит секреты — не передавай его никому.</p>
+
+      <div class="modal-actions">
+        <button id="btnSettingsClose" class="btn primary">Готово</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="totp.js"></script>
+  <script src="vendor/jsQR.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
